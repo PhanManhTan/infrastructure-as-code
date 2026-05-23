@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "NT548-Lab1 - EC2 instances in Public and Private Subnets"
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: NT548-Lab1
+  AmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id
+    Description: "Ubuntu Server 24.04 LTS latest AMI (fetched from Canonical SSM Parameter Store)"
+  InstanceType:
+    Type: String
+    Default: t3.micro
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: "Name of an existing EC2 Key Pair for SSH access"
+
+Resources:
+  PublicEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      SubnetId: !ImportValue
+        Fn::Sub: "${ProjectName}-PublicSubnetId"
+      SecurityGroupIds:
+        - !ImportValue
+          Fn::Sub: "${ProjectName}-PublicEC2SgId"
+      KeyName: !Ref KeyPairName
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-public-ec2"
+
+  PrivateEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      SubnetId: !ImportValue
+        Fn::Sub: "${ProjectName}-PrivateSubnetId"
+      SecurityGroupIds:
+        - !ImportValue
+          Fn::Sub: "${ProjectName}-PrivateEC2SgId"
+      KeyName: !Ref KeyPairName
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-private-ec2"
+
+Outputs:
+  PublicEC2PublicIp:
+    Description: "Public IP of the public EC2 instance"
+    Value: !GetAtt PublicEC2Instance.PublicIp
+
+  PrivateEC2PrivateIp:
+    Description: "Private IP of the private EC2 instance"
+    Value: !GetAtt PrivateEC2Instance.PrivateIp
+
+  SshToPublic:
+    Description: "SSH command to connect to the public EC2"
+    Value: !Sub "ssh -i <your-key>.pem ubuntu@${PublicEC2Instance.PublicIp}"
+
+  SshToPrivateViaProxy:
+    Description: "SSH proxy command to connect to the private EC2 via public EC2"
+    Value: !Sub "ssh -i <your-key>.pem -o ProxyCommand='ssh -i <your-key>.pem -W %h:%p ubuntu@${PublicEC2Instance.PublicIp}' ubuntu@${PrivateEC2Instance.PrivateIp}"
+

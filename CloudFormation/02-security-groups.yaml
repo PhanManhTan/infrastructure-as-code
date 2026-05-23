@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "NT548-Lab1 - Security Groups for Public and Private EC2"
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: NT548-Lab1
+  SshAllowedCidr:
+    Type: String
+    Default: "0.0.0.0/0"
+    Description: "CIDR allowed to SSH into the public EC2. Use your IP (e.g. 1.2.3.4/32) for production."
+
+Resources:
+  PublicEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow SSH from allowed CIDR"
+      VpcId: !ImportValue
+        Fn::Sub: "${ProjectName}-VpcId"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref SshAllowedCidr
+          Description: "SSH access"
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: "0.0.0.0/0"
+          Description: "Allow all outbound"
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-public-ec2-sg"
+
+  PrivateEC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Allow SSH only from public EC2 security group"
+      VpcId: !ImportValue
+        Fn::Sub: "${ProjectName}-VpcId"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          SourceSecurityGroupId: !Ref PublicEC2SecurityGroup
+          Description: "SSH from public EC2"
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: "0.0.0.0/0"
+          Description: "Allow all outbound"
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-private-ec2-sg"
+
+Outputs:
+  PublicEC2SgId:
+    Value: !Ref PublicEC2SecurityGroup
+    Export:
+      Name: !Sub "${ProjectName}-PublicEC2SgId"
+
+  PrivateEC2SgId:
+    Value: !Ref PrivateEC2SecurityGroup
+    Export:
+      Name: !Sub "${ProjectName}-PrivateEC2SgId"
