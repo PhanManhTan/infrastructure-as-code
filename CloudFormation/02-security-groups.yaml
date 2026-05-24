@@ -4,7 +4,7 @@ Description: "Security Groups for Public and Private EC2"
 Parameters:
   ProjectName:
     Type: String
-    Default: NT548-Lab1
+    Default: Your-project
   SshAllowedCidr:
     Type: String
     Default: "0.0.0.0/0"
