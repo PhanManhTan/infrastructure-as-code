@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: NT548-Lab1 - VPC, Subnets, IGW, NAT Gateway, Route Tables
+Description: VPC, Subnets, IGW, NAT Gateway, Route Tables
 
 Parameters:
   ProjectName:
