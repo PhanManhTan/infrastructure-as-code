@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "NT548-Lab1 - EC2 instances in Public and Private Subnets"
+Description: "EC2 instances in Public and Private Subnets"
 
 Parameters:
   ProjectName:
     Type: String
-    Default: NT548-Lab1
+    Default: Your-project
   AmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id
