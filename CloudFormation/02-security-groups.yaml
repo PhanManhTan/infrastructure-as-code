@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "NT548-Lab1 - Security Groups for Public and Private EC2"
+Description: "Security Groups for Public and Private EC2"
 
 Parameters:
   ProjectName:
