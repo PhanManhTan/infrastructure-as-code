@@ -4,7 +4,7 @@ Description: VPC, Subnets, IGW, NAT Gateway, Route Tables
 Parameters:
   ProjectName:
     Type: String
-    Default: NT548-Lab1
+    Default: Your-project
   VpcCidr:
     Type: String
     Default: 10.0.0.0/16
